@@ -1,5 +1,5 @@
 import React from 'react';
-import { Wrench, Droplet, Cog, Cpu, Wifi, CheckCircle2, Send } from 'lucide-react';
+import { Wrench, Droplet, Cog, Cpu, Wifi, CheckCircle2, Send, Printer } from 'lucide-react';
 import { STORE_INFO } from '../../config/store.config';
 
 export interface ServicesOverviewProps {
@@ -56,6 +56,15 @@ export const ServicesOverview: React.FC<ServicesOverviewProps> = ({
       models: 'Windows 10, 11, MacOS, Laptop',
       desc: 'Cài đặt driver chuẩn, khắc phục triệt để lỗi chia sẻ máy in mạng nội bộ 0x0000011b, 0x00000709, cài đặt in trực tiếp từ điện thoại.',
       features: ['Chia sẻ in cho cả phòng ban', 'In không dây qua điện thoại / iPad', 'Hỗ trợ Ultraviewer miễn phí 30 ngày']
+    },
+    {
+      icon: Printer,
+      iconColor: 'text-purple-600 bg-purple-100',
+      title: 'Sửa Chữa & Bảo Dưỡng Photocopy',
+      price: 'Gọi hoặc nhắn Zalo',
+      models: 'Ricoh, Toshiba, Canon, Sharp, Konica...',
+      desc: 'Sửa chữa chuyên sâu máy photocopy văn phòng: xử lý kẹt giấy khay gầm, thay bột từ, thay gạt băng tải, nạp mực photocopy tận nơi giá sỉ.',
+      features: ['Linh kiện chuẩn hãng Ricoh/Toshiba', 'Vệ sinh gương quét, cụm laser quang học', 'Hỗ trợ kỹ thuật tận nơi tại Tây Ninh']
     }
   ];
 

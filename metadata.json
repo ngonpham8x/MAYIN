@@ -1,6 +1,6 @@
 {
-  "name": "Sửa Máy In Tại Nhà Ân Phát - Mr. Ân",
-  "description": "Dịch vụ sửa máy in tại nhà chuyên nghiệp, đặt lịch nhanh 30 phút, báo giá công khai, mua bán máy in cũ mới, bảo trì định kỳ văn phòng và cá nhân. Hotline Mr. Ân: 0938.386.326.",
+  "name": "Thiết Bị Văn Phòng Bến Dược - Công Ty Kỹ Thuật Bảo Đạt - Mr. Ân",
+  "description": "Chuyên kinh doanh sản phẩm và cung cấp dịch vụ sửa chữa thiết bị văn phòng, máy in, máy photocopy tại Tây Ninh. Nạp mực tận nơi, sửa kẹt giấy, bảo trì định kỳ doanh nghiệp. Hotline Mr. Ân: 0938.386.326.",
   "requestFramePermissions": [],
-  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+  "majorCapabilities": []
 }

@@ -9,3 +9,4 @@ export * from '../modules/contact';
 export * from '../modules/chat';
 export * from '../modules/cart';
 export * from '../modules/admin';
+export * from '../modules/maintenance';

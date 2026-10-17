@@ -95,6 +95,9 @@ export const Header: React.FC<HeaderProps> = ({
             <a href="#san-pham" className="hover:text-blue-600 transition-colors">
               Máy In Cũ & Mới
             </a>
+            <a href="#bao-tri" className="hover:text-blue-600 transition-colors">
+              Bảo Trì Định Kỳ
+            </a>
             <a href="#vi-tri" className="hover:text-blue-600 transition-colors">
               Bản Đồ Tiệm
             </a>
@@ -261,6 +264,13 @@ export const Header: React.FC<HeaderProps> = ({
               className="px-3 py-2.5 text-slate-700 hover:bg-slate-50 rounded-xl"
             >
               Kho Máy In Cũ & Mới Chính Hãng
+            </a>
+            <a
+              href="#bao-tri"
+              onClick={() => setMobileMenuOpen(false)}
+              className="px-3 py-2.5 text-slate-700 hover:bg-slate-50 rounded-xl"
+            >
+              Gói Bảo Trì Định Kỳ Doanh Nghiệp
             </a>
             <a
               href="#vi-tri"

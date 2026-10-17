@@ -12,9 +12,11 @@ import {
   CartModal,
   ServiceSettingsModal,
   AdminLoginModal,
+  MaintenancePlans,
   ScrollReveal,
 } from './modules';
 import { useCart, usePricing, useAdminAuth, useModalManager } from './hooks';
+import { PrinterProduct } from './types';
 
 export default function App() {
   // 1. Isolated Business Logic Hooks
@@ -22,6 +24,12 @@ export default function App() {
   const { pricingList, setPricingList, priceDisplayMode, setPriceDisplayMode, resetToDefault } = usePricing();
   const { isAdminLoggedIn, loginSuccess, logout } = useAdminAuth();
   const modalManager = useModalManager();
+
+  // Handle immediate order - adds item to cart and opens checkout modal
+  const handleOrderNow = (product: PrinterProduct) => {
+    addToCart(product);
+    modalManager.openCart();
+  };
 
   // 2. Navigation smooth-scroll helper
   const handleScrollToPricing = () => {
@@ -93,11 +101,16 @@ export default function App() {
         <ScrollReveal threshold={0.08} delay={50} duration={0.5} distance={20}>
           <PrinterCatalog
             onAddToCart={addToCart}
-            onOpenOrderModal={addToCart}
+            onOpenOrderModal={handleOrderNow}
           />
         </ScrollReveal>
 
-        {/* Module 6: Google Maps & Location */}
+        {/* Module 6: Periodic Maintenance Plans */}
+        <ScrollReveal threshold={0.08} delay={50} duration={0.5} distance={20}>
+          <MaintenancePlans onRequestConsultation={handleScrollToPricing} />
+        </ScrollReveal>
+
+        {/* Module 7: Google Maps & Location */}
         <ScrollReveal threshold={0.08} delay={50} duration={0.5} distance={20}>
           <GoogleMapsLocation />
         </ScrollReveal>

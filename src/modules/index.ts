@@ -9,3 +9,4 @@ export * from './contact';
 export * from './chat';
 export * from './cart';
 export * from './admin';
+export * from './maintenance';

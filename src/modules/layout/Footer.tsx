@@ -58,6 +58,11 @@ export const Footer: React.FC = () => {
                   • Bán máy in cũ lướt & mới chính hãng
                 </a>
               </li>
+              <li>
+                <a href="#bao-tri" className="hover:text-blue-400 transition-colors">
+                  • Gói bảo trì định kỳ doanh nghiệp & cơ quan
+                </a>
+              </li>
             </ul>
           </div>
 

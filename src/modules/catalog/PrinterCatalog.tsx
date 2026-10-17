@@ -15,6 +15,15 @@ export const PrinterCatalog: React.FC<PrinterCatalogProps> = ({
 }) => {
   const [activeTab, setActiveTab] = useState<'all' | 'used' | 'new' | 'canon' | 'hp' | 'brother' | 'epson'>('all');
   const [selectedProduct, setSelectedProduct] = useState<PrinterProduct | null>(null);
+  const [addedProductId, setAddedProductId] = useState<string | null>(null);
+
+  const handleAddToCart = (product: PrinterProduct) => {
+    onAddToCart(product);
+    setAddedProductId(product.id);
+    setTimeout(() => {
+      setAddedProductId(null);
+    }, 2000);
+  };
 
   const tabs = [
     { key: 'all', label: 'Tất Cả' },
@@ -183,27 +192,60 @@ export const PrinterCatalog: React.FC<PrinterCatalogProps> = ({
                 </div>
               </div>
 
-              {/* Bottom Actions: Zalo & Phone */}
-              <div className="p-4 pt-0 grid grid-cols-2 gap-2">
-                <a
-                  href={`https://zalo.me/${STORE_INFO.phone}?text=${encodeURIComponent(
-                    `Xin chào Mr. Ân, tôi cần báo giá và tư vấn mua máy in: ${product.name} (${product.conditionText}).`
-                  )}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-full min-h-[44px] bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-2 rounded-xl text-xs transition-colors flex items-center justify-center gap-1.5 shadow-xs text-center truncate"
-                >
-                  <Send className="w-3.5 h-3.5 shrink-0" />
-                  <span>Nhắn Zalo</span>
-                </a>
+              {/* Bottom Actions: Cart, Order, Zalo & Phone */}
+              <div className="p-4 pt-0 space-y-2">
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    onClick={() => handleAddToCart(product)}
+                    className={`w-full min-h-[38px] font-bold py-2 px-2 rounded-xl text-xs transition-all flex items-center justify-center gap-1.5 shadow-xs text-center truncate ${
+                      addedProductId === product.id
+                        ? 'bg-emerald-600 text-white'
+                        : 'bg-slate-100 hover:bg-blue-50 text-slate-800 hover:text-blue-700 border border-slate-200'
+                    }`}
+                  >
+                    {addedProductId === product.id ? (
+                      <>
+                        <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
+                        <span>Đã Thêm!</span>
+                      </>
+                    ) : (
+                      <>
+                        <ShoppingCart className="w-3.5 h-3.5 text-blue-600 shrink-0" />
+                        <span>Thêm Giỏ</span>
+                      </>
+                    )}
+                  </button>
 
-                <a
-                  href={`tel:${STORE_INFO.phone}`}
-                  className="w-full min-h-[44px] bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 font-bold py-2.5 px-2 rounded-xl text-xs transition-colors flex items-center justify-center gap-1.5 text-center truncate"
-                >
-                  <Phone className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                  <span>Gọi Mr. Ân</span>
-                </a>
+                  <button
+                    onClick={() => onOpenOrderModal(product)}
+                    className="w-full min-h-[38px] bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-2 rounded-xl text-xs transition-colors flex items-center justify-center gap-1.5 shadow-xs text-center truncate"
+                  >
+                    <span>Đặt Mua</span>
+                    <ArrowRight className="w-3.5 h-3.5 shrink-0" />
+                  </button>
+                </div>
+
+                <div className="grid grid-cols-2 gap-2">
+                  <a
+                    href={`https://zalo.me/${STORE_INFO.phone}?text=${encodeURIComponent(
+                      `Xin chào Mr. Ân, tôi cần báo giá và tư vấn mua máy in: ${product.name} (${product.conditionText}).`
+                    )}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full min-h-[36px] bg-slate-50 hover:bg-blue-50 text-blue-700 border border-blue-200/80 font-bold py-1.5 px-2 rounded-xl text-xs transition-colors flex items-center justify-center gap-1 text-center truncate"
+                  >
+                    <Send className="w-3 h-3 text-blue-600 shrink-0" />
+                    <span>Nhắn Zalo</span>
+                  </a>
+
+                  <a
+                    href={`tel:${STORE_INFO.phone}`}
+                    className="w-full min-h-[36px] bg-slate-50 hover:bg-emerald-50 text-emerald-800 border border-emerald-200/80 font-bold py-1.5 px-2 rounded-xl text-xs transition-colors flex items-center justify-center gap-1 text-center truncate"
+                  >
+                    <Phone className="w-3 h-3 text-emerald-600 shrink-0" />
+                    <span>Gọi Mr. Ân</span>
+                  </a>
+                </div>
               </div>
             </div>
           ))}
@@ -325,26 +367,53 @@ export const PrinterCatalog: React.FC<PrinterCatalogProps> = ({
             </div>
 
             {/* Modal Actions */}
-            <div className="mt-5 grid grid-cols-1 sm:grid-cols-2 gap-2">
-              <a
-                href={`https://zalo.me/${STORE_INFO.phone}?text=${encodeURIComponent(
-                  `Xin chào Mr. Ân, tôi cần báo giá và tư vấn mua máy in: ${selectedProduct.name} (${selectedProduct.conditionText}).`
-                )}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-full min-h-[44px] bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-3 rounded-xl text-xs transition-colors flex items-center justify-center gap-2 shadow-xs text-center"
-              >
-                <Send className="w-4 h-4 shrink-0" />
-                <span>Nhắn Tin Zalo Mr. Ân</span>
-              </a>
+            <div className="mt-5 space-y-2">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <button
+                  onClick={() => handleAddToCart(selectedProduct)}
+                  className={`w-full min-h-[44px] font-bold py-2.5 px-3 rounded-xl text-xs transition-colors flex items-center justify-center gap-2 shadow-xs text-center ${
+                    addedProductId === selectedProduct.id
+                      ? 'bg-emerald-600 text-white'
+                      : 'bg-slate-100 hover:bg-blue-50 text-slate-800 hover:text-blue-700 border border-slate-200'
+                  }`}
+                >
+                  <ShoppingCart className="w-4 h-4 text-blue-600 shrink-0" />
+                  <span>{addedProductId === selectedProduct.id ? 'Đã Thêm Vào Giỏ Hàng!' : 'Thêm Vào Giỏ Hàng'}</span>
+                </button>
 
-              <a
-                href={`tel:${STORE_INFO.phone}`}
-                className="w-full min-h-[44px] bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 px-3 rounded-xl text-xs transition-colors flex items-center justify-center gap-2 shadow-xs text-center"
-              >
-                <Phone className="w-4 h-4 shrink-0" />
-                <span>Gọi Mr. Ân: {STORE_INFO.displayPhone}</span>
-              </a>
+                <button
+                  onClick={() => {
+                    setSelectedProduct(null);
+                    onOpenOrderModal(selectedProduct);
+                  }}
+                  className="w-full min-h-[44px] bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-3 rounded-xl text-xs transition-colors flex items-center justify-center gap-2 shadow-xs text-center"
+                >
+                  <span>Đặt Mua Ngay</span>
+                  <ArrowRight className="w-4 h-4 shrink-0" />
+                </button>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <a
+                  href={`https://zalo.me/${STORE_INFO.phone}?text=${encodeURIComponent(
+                    `Xin chào Mr. Ân, tôi cần báo giá và tư vấn mua máy in: ${selectedProduct.name} (${selectedProduct.conditionText}).`
+                  )}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full min-h-[40px] bg-blue-50 hover:bg-blue-100 text-blue-800 border border-blue-200 font-bold py-2 px-3 rounded-xl text-xs transition-colors flex items-center justify-center gap-2 text-center"
+                >
+                  <Send className="w-3.5 h-3.5 text-blue-600 shrink-0" />
+                  <span>Nhắn Tin Zalo Mr. Ân</span>
+                </a>
+
+                <a
+                  href={`tel:${STORE_INFO.phone}`}
+                  className="w-full min-h-[40px] bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 font-bold py-2 px-3 rounded-xl text-xs transition-colors flex items-center justify-center gap-2 text-center"
+                >
+                  <Phone className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                  <span>Gọi Mr. Ân: {STORE_INFO.displayPhone}</span>
+                </a>
+              </div>
             </div>
           </div>
         </div>
