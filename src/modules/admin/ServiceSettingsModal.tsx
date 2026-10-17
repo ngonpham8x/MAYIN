@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Plus, Trash2, Edit2, Check, RefreshCw, Settings, ShieldCheck, Phone, Send, DollarSign, LogOut, KeyRound, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { X, Plus, Trash2, Edit2, Check, RefreshCw, Settings, ShieldCheck, Phone, Send, DollarSign, LogOut, KeyRound, AlertCircle, CheckCircle2, Image as ImageIcon, Upload, Camera } from 'lucide-react';
 import { PricingItem, PriceDisplayMode } from '../../types';
 import { STORE_INFO } from '../../config/store.config';
 
@@ -35,6 +35,47 @@ export const ServiceSettingsModal: React.FC<ServiceSettingsModalProps> = ({
   const [newPrice, setNewPrice] = useState('Gọi hoặc nhắn Zalo 0938.386.326');
   const [newWarranty, setNewWarranty] = useState('Bảo hành tận nơi chu đáo');
   const [newDescription, setNewDescription] = useState('');
+  const [newImageUrl, setNewImageUrl] = useState('');
+
+  // Image compression and encoding helper for client storage
+  const handleImageUpload = (file: File, callback: (url: string) => void) => {
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+      alert('Vui lòng chọn tệp hình ảnh hợp lệ (JPG, PNG, WebP)!');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const maxDim = 800;
+        let width = img.width;
+        let height = img.height;
+        if (width > maxDim || height > maxDim) {
+          if (width > height) {
+            height = Math.round((height * maxDim) / width);
+            width = maxDim;
+          } else {
+            width = Math.round((width * maxDim) / height);
+            height = maxDim;
+          }
+        }
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          ctx.drawImage(img, 0, 0, width, height);
+          const compressed = canvas.toDataURL('image/jpeg', 0.8);
+          callback(compressed);
+        } else {
+          callback(e.target?.result as string);
+        }
+      };
+      img.src = e.target?.result as string;
+    };
+    reader.readAsDataURL(file);
+  };
 
   // Password change state
   const [oldPassword, setOldPassword] = useState('');
@@ -87,13 +128,15 @@ export const ServiceSettingsModal: React.FC<ServiceSettingsModalProps> = ({
       price: newPrice.trim() || 'Gọi hoặc nhắn Zalo 0938.386.326',
       warranty: newWarranty.trim(),
       description: newDescription.trim() || 'Kỹ thuật viên kiểm tra tận nơi miễn phí, báo giá trước khi làm.',
-      popular: true
+      popular: true,
+      imageUrl: newImageUrl.trim() || undefined
     };
 
     onSavePricingList([newItem, ...pricingList]);
     setNewName('');
     setNewModels('');
     setNewDescription('');
+    setNewImageUrl('');
     setActiveTab('services_list');
   };
 
@@ -366,6 +409,55 @@ export const ServiceSettingsModal: React.FC<ServiceSettingsModalProps> = ({
                     />
                   </div>
 
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-700 mb-1">
+                      Hình ảnh minh họa dịch vụ / linh kiện (Tùy chọn):
+                    </label>
+                    <div className="flex items-center gap-3 bg-white p-2.5 rounded-xl border border-slate-200">
+                      {editingItem.imageUrl ? (
+                        <div className="relative w-16 h-16 rounded-lg border border-slate-300 overflow-hidden shrink-0 group">
+                          <img src={editingItem.imageUrl} alt="Preview" className="w-full h-full object-cover" />
+                          <button
+                            type="button"
+                            onClick={() => setEditingItem({ ...editingItem, imageUrl: undefined })}
+                            className="absolute top-0.5 right-0.5 p-0.5 bg-red-600 text-white rounded-full hover:bg-red-700 transition-colors"
+                            title="Xóa ảnh"
+                          >
+                            <X className="w-3 h-3" />
+                          </button>
+                        </div>
+                      ) : (
+                        <div className="w-16 h-16 rounded-lg border-2 border-dashed border-slate-300 flex flex-col items-center justify-center text-slate-400 shrink-0 bg-slate-50">
+                          <ImageIcon className="w-5 h-5 mb-0.5 text-slate-300" />
+                          <span className="text-[9px]">Chưa có ảnh</span>
+                        </div>
+                      )}
+
+                      <div className="flex-1 space-y-1.5">
+                        <label className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg border border-blue-200 bg-blue-50 text-blue-700 hover:bg-blue-100 font-bold text-xs cursor-pointer transition-colors shadow-2xs">
+                          <Upload className="w-3 h-3" />
+                          <span>Tải ảnh từ máy / ĐT</span>
+                          <input
+                            type="file"
+                            accept="image/*"
+                            className="hidden"
+                            onChange={e => {
+                              const file = e.target.files?.[0];
+                              if (file) handleImageUpload(file, url => setEditingItem({ ...editingItem, imageUrl: url }));
+                            }}
+                          />
+                        </label>
+                        <input
+                          type="text"
+                          value={editingItem.imageUrl || ''}
+                          onChange={e => setEditingItem({ ...editingItem, imageUrl: e.target.value })}
+                          placeholder="Hoặc dán URL ảnh (https://...)"
+                          className="w-full border border-slate-300 rounded-lg px-2.5 py-1 text-xs bg-white text-slate-700"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
                   <div className="flex justify-end gap-2 pt-1">
                     <button
                       type="button"
@@ -408,6 +500,13 @@ export const ServiceSettingsModal: React.FC<ServiceSettingsModalProps> = ({
                     key={item.id}
                     className="p-3 bg-slate-50 rounded-xl border border-slate-200 flex items-start justify-between gap-3 text-xs"
                   >
+                    {item.imageUrl && (
+                      <img
+                        src={item.imageUrl}
+                        alt={item.serviceName}
+                        className="w-12 h-12 rounded-lg object-cover border border-slate-200 shrink-0 shadow-2xs"
+                      />
+                    )}
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
                         <span className="text-[10px] bg-blue-100 text-blue-800 font-bold px-1.5 py-0.2 rounded">
@@ -521,6 +620,61 @@ export const ServiceSettingsModal: React.FC<ServiceSettingsModalProps> = ({
                   placeholder="Mô tả công việc, linh kiện thay thế..."
                   className="w-full border border-slate-300 rounded-xl px-3 py-2 text-xs"
                 />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 mb-1">
+                  Đính kèm hình ảnh minh họa (Tùy chọn):
+                </label>
+                <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center bg-slate-50 p-3 rounded-xl border border-slate-200">
+                  {newImageUrl ? (
+                    <div className="relative w-20 h-20 rounded-xl border border-slate-300 overflow-hidden shrink-0 group shadow-xs">
+                      <img src={newImageUrl} alt="Preview" className="w-full h-full object-cover" />
+                      <button
+                        type="button"
+                        onClick={() => setNewImageUrl('')}
+                        className="absolute top-1 right-1 p-1 bg-red-600 text-white rounded-full hover:bg-red-700 transition-colors shadow-xs"
+                        title="Xóa ảnh"
+                      >
+                        <X className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="w-20 h-20 rounded-xl border-2 border-dashed border-slate-300 flex flex-col items-center justify-center text-slate-400 shrink-0 bg-white">
+                      <ImageIcon className="w-6 h-6 mb-1 text-slate-300" />
+                      <span className="text-[10px]">Chưa có ảnh</span>
+                    </div>
+                  )}
+
+                  <div className="flex-1 w-full space-y-2">
+                    <div className="flex items-center gap-2">
+                      <label className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-blue-200 bg-blue-50 text-blue-700 hover:bg-blue-100 font-bold text-xs cursor-pointer transition-colors shadow-2xs">
+                        <Upload className="w-3.5 h-3.5" />
+                        <span>Tải ảnh từ máy / điện thoại</span>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={e => {
+                            const file = e.target.files?.[0];
+                            if (file) handleImageUpload(file, setNewImageUrl);
+                          }}
+                        />
+                      </label>
+                      {newImageUrl && (
+                        <span className="text-[11px] text-emerald-600 font-semibold">✓ Đã đính kèm ảnh</span>
+                      )}
+                    </div>
+
+                    <input
+                      type="text"
+                      value={newImageUrl}
+                      onChange={e => setNewImageUrl(e.target.value)}
+                      placeholder="Hoặc dán link ảnh trực tiếp (https://...)"
+                      className="w-full border border-slate-300 rounded-xl px-3 py-1.5 text-xs text-slate-700 bg-white"
+                    />
+                  </div>
+                </div>
               </div>
 
               <div className="pt-2 flex justify-end">

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { STORE_INFO } from '../../config/store.config';
-import { ShieldCheck, Search, Calculator, CheckCircle2, Phone, Sparkles, Settings, Send, Lock } from 'lucide-react';
+import { ShieldCheck, Search, Calculator, CheckCircle2, Phone, Sparkles, Settings, Send, Lock, Eye, X, Image as ImageIcon } from 'lucide-react';
 import { PricingItem, PriceDisplayMode } from '../../types';
 
 export interface PricingSectionProps {
@@ -20,6 +20,7 @@ export const PricingSection: React.FC<PricingSectionProps> = ({
 }) => {
   const [activeCategory, setActiveCategory] = useState<'all' | 'ink' | 'parts' | 'repair' | 'software'>('all');
   const [searchTerm, setSearchTerm] = useState('');
+  const [previewImage, setPreviewImage] = useState<{ url: string; title: string } | null>(null);
 
   // Interactive Calculator State
   const [calcBrand, setCalcBrand] = useState('Canon');
@@ -267,19 +268,40 @@ export const PricingSection: React.FC<PricingSectionProps> = ({
               {filteredPricing.map(item => (
                 <tr key={item.id} className="hover:bg-blue-50/40 transition-colors group">
                   <td className="py-3.5 px-4">
-                    <div className="flex items-center gap-2">
-                      <span className="font-bold text-slate-900 group-hover:text-blue-700">
-                        {item.serviceName}
-                      </span>
-                      {item.popular && (
-                        <span className="bg-amber-100 text-amber-800 text-[10px] font-extrabold px-2 py-0.5 rounded-full">
-                          Phổ Biến
-                        </span>
+                    <div className="flex items-center gap-3">
+                      {item.imageUrl && (
+                        <button
+                          type="button"
+                          onClick={() => setPreviewImage({ url: item.imageUrl!, title: item.serviceName })}
+                          className="relative group shrink-0"
+                          title="Nhấp để xem ảnh phóng to"
+                        >
+                          <img
+                            src={item.imageUrl}
+                            alt={item.serviceName}
+                            className="w-12 h-12 rounded-lg object-cover border border-slate-200 group-hover:scale-105 transition-transform shadow-xs"
+                          />
+                          <div className="absolute inset-0 bg-black/25 opacity-0 group-hover:opacity-100 rounded-lg transition-opacity flex items-center justify-center">
+                            <Eye className="w-3.5 h-3.5 text-white" />
+                          </div>
+                        </button>
                       )}
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-2">
+                          <span className="font-bold text-slate-900 group-hover:text-blue-700">
+                            {item.serviceName}
+                          </span>
+                          {item.popular && (
+                            <span className="bg-amber-100 text-amber-800 text-[10px] font-extrabold px-2 py-0.5 rounded-full shrink-0">
+                              Phổ Biến
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-slate-500 text-[11px] mt-0.5 max-w-md">
+                          {item.description}
+                        </p>
+                      </div>
                     </div>
-                    <p className="text-slate-500 text-[11px] mt-0.5 max-w-md">
-                      {item.description}
-                    </p>
                   </td>
                   <td className="py-3.5 px-4 text-slate-600 font-medium">
                     {item.applicableModels}
@@ -328,20 +350,37 @@ export const PricingSection: React.FC<PricingSectionProps> = ({
               key={item.id}
               className="bg-white rounded-xl border border-slate-200 p-4 shadow-xs space-y-2.5"
             >
-              <div className="flex items-start justify-between gap-2">
-                <h4 className="text-sm font-bold text-slate-900 leading-snug">
-                  {item.serviceName}
-                </h4>
-                {item.popular && (
-                  <span className="bg-amber-100 text-amber-800 text-[10px] font-bold px-2 py-0.5 rounded-full shrink-0">
-                    Phổ Biến
-                  </span>
+              <div className="flex items-start gap-3">
+                {item.imageUrl && (
+                  <button
+                    type="button"
+                    onClick={() => setPreviewImage({ url: item.imageUrl!, title: item.serviceName })}
+                    className="relative group shrink-0"
+                    title="Xem ảnh"
+                  >
+                    <img
+                      src={item.imageUrl}
+                      alt={item.serviceName}
+                      className="w-14 h-14 rounded-xl object-cover border border-slate-200 shadow-xs"
+                    />
+                  </button>
                 )}
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-start justify-between gap-2">
+                    <h4 className="text-sm font-bold text-slate-900 leading-snug">
+                      {item.serviceName}
+                    </h4>
+                    {item.popular && (
+                      <span className="bg-amber-100 text-amber-800 text-[10px] font-bold px-2 py-0.5 rounded-full shrink-0">
+                        Phổ Biến
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-xs text-blue-600 font-medium mt-0.5">
+                    Dòng máy: {item.applicableModels}
+                  </p>
+                </div>
               </div>
-
-              <p className="text-xs text-blue-600 font-medium">
-                Dòng máy: {item.applicableModels}
-              </p>
 
               <p className="text-xs text-slate-600">
                 {item.description}
@@ -381,6 +420,37 @@ export const PricingSection: React.FC<PricingSectionProps> = ({
           ))}
         </div>
       </div>
+
+      {/* Image Lightbox Modal */}
+      {previewImage && (
+        <div 
+          className="fixed inset-0 z-50 bg-black/75 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4"
+          onClick={() => setPreviewImage(null)}
+        >
+          <div 
+            className="bg-white rounded-2xl max-w-lg w-full overflow-hidden shadow-2xl relative"
+            onClick={e => e.stopPropagation()}
+          >
+            <div className="px-4 py-3 bg-slate-900 text-white flex items-center justify-between">
+              <span className="font-bold text-xs truncate max-w-[85%]">{previewImage.title}</span>
+              <button
+                onClick={() => setPreviewImage(null)}
+                className="p-1 hover:bg-slate-800 rounded-full text-slate-300 hover:text-white transition-colors"
+                title="Đóng ảnh"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="p-3 bg-slate-100 flex items-center justify-center max-h-[75vh] overflow-hidden">
+              <img
+                src={previewImage.url}
+                alt={previewImage.title}
+                className="max-h-[70vh] w-auto max-w-full object-contain rounded-lg shadow-xs"
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   );
 };

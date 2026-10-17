@@ -14,4 +14,5 @@ export interface PricingItem {
   description: string;
   popular?: boolean;
   contactNote?: string;
+  imageUrl?: string;
 }
