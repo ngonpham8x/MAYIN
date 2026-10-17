@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { MAINTENANCE_PLANS } from '../../data';
 import { STORE_INFO } from '../../config/store.config';
 import { ShieldCheck, CheckCircle2, Phone, Send, X, Building2, UserCheck, Check, Sparkles } from 'lucide-react';
@@ -151,10 +152,13 @@ export const MaintenancePlans: React.FC<MaintenancePlansProps> = ({ onRequestCon
         </div>
       </div>
 
-      {/* Consultation Modal */}
-      {modalOpen && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4">
-          <div className="bg-white rounded-2xl max-w-lg w-full max-h-[92vh] overflow-y-auto p-4 sm:p-6 shadow-2xl relative">
+      {/* Consultation Modal via React Portal */}
+      {modalOpen && typeof document !== 'undefined' && createPortal(
+        <div 
+          className="fixed inset-0 z-[9999] bg-black/75 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4"
+          style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0 }}
+        >
+          <div className="bg-white rounded-2xl max-w-lg w-full max-h-[92vh] overflow-y-auto p-4 sm:p-6 shadow-2xl relative animate-in fade-in zoom-in-95 duration-150">
             <button
               onClick={() => setModalOpen(false)}
               className="absolute top-3 right-3 p-2 text-slate-400 hover:text-slate-700 rounded-full hover:bg-slate-100"
@@ -291,7 +295,8 @@ export const MaintenancePlans: React.FC<MaintenancePlansProps> = ({ onRequestCon
               </form>
             )}
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </section>
   );

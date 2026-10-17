@@ -20,12 +20,25 @@ export const ScrollReveal: React.FC<ScrollRevealProps> = ({
   threshold = 0.08,
 }) => {
   const [isVisible, setIsVisible] = useState(false);
+  const [animationDone, setAnimationDone] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (isVisible) {
+      const timer = setTimeout(() => {
+        setAnimationDone(true);
+      }, delay + duration * 1000 + 100);
+      return () => clearTimeout(timer);
+    } else {
+      setAnimationDone(false);
+    }
+  }, [isVisible, delay, duration]);
 
   useEffect(() => {
     // Respect user's motion accessibility preferences
     if (typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       setIsVisible(true);
+      setAnimationDone(true);
       return;
     }
 
@@ -34,6 +47,7 @@ export const ScrollReveal: React.FC<ScrollRevealProps> = ({
 
     if (!('IntersectionObserver' in window)) {
       setIsVisible(true);
+      setAnimationDone(true);
       return;
     }
 
@@ -69,11 +83,11 @@ export const ScrollReveal: React.FC<ScrollRevealProps> = ({
       className={`transition-all ${className}`}
       style={{
         opacity: isVisible ? 1 : 0,
-        transform: isVisible ? 'translate3d(0, 0, 0)' : `translate3d(0, ${distance}px, 0)`,
+        transform: animationDone ? 'none' : isVisible ? 'translate3d(0, 0, 0)' : `translate3d(0, ${distance}px, 0)`,
         transitionDuration: `${duration}s`,
         transitionDelay: `${delay}ms`,
         transitionTimingFunction: 'cubic-bezier(0.16, 1, 0.3, 1)',
-        willChange: isVisible ? 'auto' : 'opacity, transform',
+        willChange: animationDone ? 'auto' : 'opacity, transform',
       }}
     >
       {children}

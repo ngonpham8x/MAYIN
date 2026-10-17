@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { STORE_INFO } from '../../config/store.config';
 import { ShieldCheck, Search, Calculator, CheckCircle2, Phone, Sparkles, Settings, Send, Lock, Eye, X, Image as ImageIcon } from 'lucide-react';
 import { PricingItem, PriceDisplayMode } from '../../types';
@@ -21,6 +22,24 @@ export const PricingSection: React.FC<PricingSectionProps> = ({
   const [activeCategory, setActiveCategory] = useState<'all' | 'ink' | 'parts' | 'repair' | 'software'>('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [previewImage, setPreviewImage] = useState<{ url: string; title: string } | null>(null);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setPreviewImage(null);
+      }
+    };
+    if (previewImage) {
+      document.body.style.overflow = 'hidden';
+      window.addEventListener('keydown', handleKeyDown);
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [previewImage]);
 
   // Interactive Calculator State
   const [calcBrand, setCalcBrand] = useState('Canon');
@@ -421,35 +440,40 @@ export const PricingSection: React.FC<PricingSectionProps> = ({
         </div>
       </div>
 
-      {/* Image Lightbox Modal */}
-      {previewImage && (
+      {/* Image Lightbox Modal via Portal to avoid parent transform/overflow issues */}
+      {previewImage && typeof document !== 'undefined' && createPortal(
         <div 
-          className="fixed inset-0 z-50 bg-black/75 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4"
+          className="fixed inset-0 z-[9999] bg-black/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-6"
           onClick={() => setPreviewImage(null)}
+          style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0 }}
         >
           <div 
-            className="bg-white rounded-2xl max-w-lg w-full overflow-hidden shadow-2xl relative"
+            className="bg-slate-900 rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden shadow-2xl relative flex flex-col border border-slate-700 animate-in fade-in zoom-in-95 duration-150"
             onClick={e => e.stopPropagation()}
           >
-            <div className="px-4 py-3 bg-slate-900 text-white flex items-center justify-between">
-              <span className="font-bold text-xs truncate max-w-[85%]">{previewImage.title}</span>
+            <div className="px-4 py-3 bg-slate-950 text-white flex items-center justify-between border-b border-slate-800 shrink-0">
+              <div className="flex items-center gap-2 min-w-0 pr-2">
+                <ImageIcon className="w-4 h-4 text-blue-400 shrink-0" />
+                <span className="font-bold text-xs sm:text-sm truncate text-slate-100">{previewImage.title}</span>
+              </div>
               <button
                 onClick={() => setPreviewImage(null)}
-                className="p-1 hover:bg-slate-800 rounded-full text-slate-300 hover:text-white transition-colors"
-                title="Đóng ảnh"
+                className="p-1.5 hover:bg-slate-800 rounded-full text-slate-400 hover:text-white transition-colors shrink-0"
+                title="Đóng ảnh (Phím Esc)"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
-            <div className="p-3 bg-slate-100 flex items-center justify-center max-h-[75vh] overflow-hidden">
+            <div className="p-3 sm:p-4 bg-slate-950 flex-1 flex items-center justify-center min-h-[220px] max-h-[78vh] overflow-auto">
               <img
                 src={previewImage.url}
                 alt={previewImage.title}
-                className="max-h-[70vh] w-auto max-w-full object-contain rounded-lg shadow-xs"
+                className="max-h-[72vh] w-auto max-w-full object-contain rounded-xl shadow-lg border border-slate-800"
               />
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </section>
   );

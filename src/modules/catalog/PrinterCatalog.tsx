@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { PRINTER_PRODUCTS, STORE_INFO } from '../../data';
 import { PrinterProduct } from '../../types';
 import { ShoppingCart, CheckCircle2, Gift, Phone, Eye, Sparkles, Filter, ShieldCheck, ArrowRight, X, Send } from 'lucide-react';
@@ -281,10 +282,13 @@ export const PrinterCatalog: React.FC<PrinterCatalogProps> = ({
         </div>
       </div>
 
-      {/* Product Detail Modal */}
-      {selectedProduct && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4">
-          <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[92vh] overflow-y-auto p-4 sm:p-8 shadow-2xl relative">
+      {/* Product Detail Modal via React Portal */}
+      {selectedProduct && typeof document !== 'undefined' && createPortal(
+        <div 
+          className="fixed inset-0 z-[9999] bg-black/75 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4"
+          style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0 }}
+        >
+          <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[92vh] overflow-y-auto p-4 sm:p-8 shadow-2xl relative animate-in fade-in zoom-in-95 duration-150">
             <button
               onClick={() => setSelectedProduct(null)}
               className="absolute top-3 right-3 p-2 text-slate-400 hover:text-slate-700 rounded-full hover:bg-slate-100"
@@ -416,7 +420,8 @@ export const PrinterCatalog: React.FC<PrinterCatalogProps> = ({
               </div>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </section>
   );
